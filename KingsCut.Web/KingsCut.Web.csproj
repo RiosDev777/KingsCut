@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="appsettings.json.example" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json.example" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="wwwroot\assets\css\style.css" />
     <None Include="wwwroot\assets\img\apple-touch-icon.png" />
     <None Include="wwwroot\assets\img\card.jpg" />

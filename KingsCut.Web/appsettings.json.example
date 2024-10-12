@@ -7,7 +7,7 @@
   },
 
   "ConnectionStrings": {
-    "MyConnection": "Server=.\\JUAN\\SQLEXPRESS;Database=KingsCut;User Id=RIOS;Password=JOSE123;encrypt=false;",
+    "MyConnection": "Server=;Database=KingsCuDBt;User Id=;Password=;encrypt=false;",
     "LocalConnection": "Server=(localdb)\\MSSQLLocalDB;Database=KingsCut;Trusted_Connection=True;MultipleActiveResultSets=true"
   },
   "AllowedHosts": "*"
