@@ -1,4 +1,5 @@
-﻿using KingsCut.Web.Data;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using KingsCut.Web.Data;
 using KingsCut.Web.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,15 +8,19 @@ namespace KingsCut.Web.Controllers
 {
     public class UsersController : Controller
     {
-        private readonly DataContext _context;
 
-        public UsersController(DataContext context)
-        {
-            _context = context;
-        }
+		private readonly DataContext _context;
+		private readonly INotyfService _notyfService;
+		
 
-        // GET: Users
-        public async Task<IActionResult> Index()
+		public UsersController(DataContext context, INotyfService notyfService)
+		{
+			_context = context;
+			_notyfService = notyfService;
+		}
+
+		// GET: Users
+		public async Task<IActionResult> Index()
         {
             return View(await _context.Users.ToListAsync());
         }

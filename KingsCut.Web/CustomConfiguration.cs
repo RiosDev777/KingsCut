@@ -16,9 +16,11 @@ namespace KingsCut.Web
                 configuration.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection"));
             });
 
+            
 
+        
 
-            builder.Services.AddNotyf(config => {
+			builder.Services.AddNotyf(config => {
                 config.DurationInSeconds = 10;
                 config.IsDismissable = true;
                 config.Position = NotyfPosition.BottomRight;

@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace KingsCut.Web.Controllers
+
 {
+
+   
     public class ProductsController : Controller
     {
         private readonly DataContext _context;
