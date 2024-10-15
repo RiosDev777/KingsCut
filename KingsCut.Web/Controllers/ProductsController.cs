@@ -1,7 +1,11 @@
-﻿using KingsCut.Web.Data;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using KingsCut.Web.Core;
+using KingsCut.Web.Data;
 using KingsCut.Web.Data.Entities;
+using KingsCut.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static System.Collections.Specialized.BitVector32;
 
 namespace KingsCut.Web.Controllers
 
@@ -10,35 +14,24 @@ namespace KingsCut.Web.Controllers
    
     public class ProductsController : Controller
     {
-        private readonly DataContext _context;
 
-        public ProductsController(DataContext context)
+        private readonly IProductsService _productsService;
+        private readonly INotyfService _notifyService;
+
+        public ProductsController(IProductsService productsService, INotyfService notyfService)
         {
-            _context = context;
+            _productsService = productsService;
+            _notifyService = notyfService;
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Products.ToListAsync());
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            Product? product = await _context.Products
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
+            _notifyService.Success("This is a Success Notification");
+            Response<List<Product>> response = await _productsService.GetListAsync();
+            return View(response.Result);
         }
 
         [HttpGet]
@@ -47,125 +40,121 @@ namespace KingsCut.Web.Controllers
             return View();
         }
 
-        
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Product product)
+
+
+        public async Task<IActionResult> Details(int id)
         {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Add(product);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateException dbUpdateException)
-                {
-                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
-                    {
-                        ModelState.AddModelError(string.Empty, "Ya existe un producto con el mismo nombre.");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    ModelState.AddModelError(string.Empty, exception.Message);
-                }
-            }
-            return View(product);
-        }
+            Response<Product> response = await _productsService.GetDetailsAsync(id);
 
-        [HttpGet]
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
+            if (response.IsSuccess)
             {
-                return NotFound();
+                return View(response.Result);
             }
 
-            Product? product = await _context.Products.FindAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-            return View(product);
-        }
-
-        
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Product product)
-        {
-            if (id != product.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-
-                }
-                catch (DbUpdateException dbUpdateException)
-                {
-                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
-                    {
-                        ModelState.AddModelError(string.Empty, "Ya existe un producto con el mismo nombre.");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    ModelState.AddModelError(string.Empty, exception.Message);
-                }
-            }
-            return View(product);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            Product? product = await _context.Products
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
-        }
-
-        
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            Product? product = await _context.Products.FindAsync(id);
-            if (product != null)
-            {
-                _context.Products.Remove(product);
-            }
-
-            await _context.SaveChangesAsync();
+            
+            _notifyService.Error(response.Message);
             return RedirectToAction(nameof(Index));
         }
 
-        
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Id,Name,Price,Description,IsActive")] Product product)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    Response<Product> response = await _productsService.CreateAsync(product);
+                    if (response.IsSuccess)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                    // TODO: Mostrar mensaje de error si no se creó el producto
+                    ModelState.AddModelError("", response.Message);
+                }
+
+                return View(product);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Error: {ex.Message}");
+                return View(product);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit([FromRoute] int id)
+        {
+            Response<Product> response = await _productsService.GetOneAsync(id);
+
+            if (response.IsSuccess)
+            {
+
+                return View(response.Result);
+            }
+
+            //TODO: mensaje error
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Product product)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+
+                    //TODO: mensaje de error
+                    return View(product);
+                }
+
+                Response<Product> response = await _productsService.EditAsync(product);
+
+                if (response.IsSuccess)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return View(response);
+            }
+            catch (Exception ex)
+            {
+
+                //TODO: mensaje de error
+                return View(product);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            Response<Product> response = await _productsService.DeleteteAsync(id);
+
+            if (response.IsSuccess)
+            {
+                _notifyService.Success(response.Message);
+            }else
+            {
+
+                _notifyService.Error(response.Message);
+
+            }
+
+                
+            return RedirectToAction(nameof(Index));
+
+            
+        }
+
+
+
+
     }
 }

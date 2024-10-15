@@ -2,7 +2,7 @@
 using KingsCut.Web.Data;
 using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
-
+using KingsCut.Web.Services;
 
 namespace KingsCut.Web
 {
@@ -11,23 +11,28 @@ namespace KingsCut.Web
         public static WebApplicationBuilder AddCustomBuilderConfiguration(this WebApplicationBuilder builder)
         {
             // Data Context
-            builder.Services.AddDbContext<DataContext>(configuration =>
+            builder.Services.AddDbContext<DataContext>(options =>
             {
-                configuration.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection"));
             });
 
-            
-
-        
-
-			builder.Services.AddNotyf(config => {
+            // Toast Notification
+            builder.Services.AddNotyf(config =>
+            {
                 config.DurationInSeconds = 10;
                 config.IsDismissable = true;
                 config.Position = NotyfPosition.BottomRight;
             });
 
-            return builder;
+            // Register services
+            AddServices(builder);
 
+            return builder;
+        }
+
+        public static void AddServices(WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IProductsService, ProductService>();
         }
 
         public static WebApplication AddCustomWebAppConfiguration(this WebApplication app)
@@ -36,6 +41,6 @@ namespace KingsCut.Web
 
             return app;
         }
-
     }
 }
+
