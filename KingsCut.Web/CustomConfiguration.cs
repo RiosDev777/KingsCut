@@ -46,9 +46,8 @@ namespace KingsCut.Web
         public static void AddServices(WebApplicationBuilder builder) 
         { 
 
-            builder.Services.AddScoped<IProductsService, ProductService>();     
-        
-
+            builder.Services.AddScoped<IProductsService, ProductService>();
+            builder.Services.AddScoped<IUsersServices, UserService>();
         }
                
 

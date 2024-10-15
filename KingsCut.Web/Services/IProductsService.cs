@@ -3,7 +3,6 @@ using KingsCut.Web.Data;
 using KingsCut.Web.Data.Entities;
 using KingsCut.Web.Helper;
 using Microsoft.EntityFrameworkCore;
-using static System.Collections.Specialized.BitVector32;
 
 namespace KingsCut.Web.Services
 {
