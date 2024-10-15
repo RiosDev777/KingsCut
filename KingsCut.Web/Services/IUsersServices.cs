@@ -73,7 +73,7 @@ namespace KingsCut.Web.Services
                 _context.Users.Remove(response.Result);
                 await _context.SaveChangesAsync();
 
-                return ResponseHelper<User>.MakeResponseSuccess(null, "Usero eliminado con éxito");
+                return ResponseHelper<User>.MakeResponseSuccess(null, "Usuario eliminado con éxito");
             }
             catch (Exception ex)
             {
@@ -104,7 +104,7 @@ namespace KingsCut.Web.Services
 
                 if (user is null)
                 {
-                    return ResponseHelper<User>.MakeResponseFail("El Usero con el id indicado no existe");
+                    return ResponseHelper<User>.MakeResponseFail("El usuario con el id indicado no existe");
                 }
 
                 return ResponseHelper<User>.MakeResponseSuccess(user);
@@ -142,7 +142,7 @@ namespace KingsCut.Web.Services
 
                 if (user is null)
                 {
-                    return ResponseHelper<User>.MakeResponseFail("El Usero con el id indicado no existe");
+                    return ResponseHelper<User>.MakeResponseFail("El Usuario con el id indicado no existe");
                 }
 
                 return ResponseHelper<User>.MakeResponseSuccess(user);
