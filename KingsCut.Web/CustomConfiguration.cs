@@ -30,9 +30,17 @@ namespace KingsCut.Web
             return builder;
         }
 
+<<<<<<< HEAD
         public static void AddServices(WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<IProductsService, ProductService>();
+=======
+        public static void AddServices(WebApplicationBuilder builder) 
+        { 
+
+            builder.Services.AddScoped<IProductsService, ProductService>();
+            builder.Services.AddScoped<IUsersServices, UserService>();
+>>>>>>> Santiago
         }
 
         public static WebApplication AddCustomWebAppConfiguration(this WebApplication app)

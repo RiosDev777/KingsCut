@@ -1,14 +1,21 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+<<<<<<< HEAD
+=======
+using KingsCut.Web.Core;
+>>>>>>> Santiago
 using KingsCut.Web.Data;
 using KingsCut.Web.Data.Entities;
+using KingsCut.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static System.Collections.Specialized.BitVector32;
 
 namespace KingsCut.Web.Controllers
 {
     public class UsersController : Controller
     {
 
+<<<<<<< HEAD
 		private readonly DataContext _context;
 		private readonly INotyfService _notyfService;
 		
@@ -21,29 +28,28 @@ namespace KingsCut.Web.Controllers
 
 		// GET: Users
 		public async Task<IActionResult> Index()
+=======
+        private readonly IUsersServices _usersService;
+        private readonly INotyfService _notifyService;
+
+        public UsersController(IUsersServices UsersService, INotyfService notyfService)
         {
-            return View(await _context.Users.ToListAsync());
+            _usersService = UsersService;
+            _notifyService = notyfService;
         }
 
-        // GET: Users/Details/5
-        public async Task<IActionResult> Details(int? id)
+
+
+        [HttpGet]
+        public async Task<IActionResult> Index()
+>>>>>>> Santiago
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return View(user);
+            _notifyService.Success("This is a Success Notification");
+            Response<List<User>> response = await _usersService.GetListAsync();
+            return View(response.Result);
         }
 
-        // GET: Users/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -51,104 +57,122 @@ namespace KingsCut.Web.Controllers
 
         
 
+
+        public async Task<IActionResult> Details(int id)
+        {
+            Response<User> response = await _usersService.GetDetailsAsync(id);
+
+            if (response.IsSuccess)
+            {
+                return View(response.Result);
+            }
+
+
+            _notifyService.Error(response.Message);
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Email,Contact,Description,IsActive")] User user)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(user);
-        }
-
-        // GET: Users/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            return View(user);
-        }
-
-        
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Email,Contact,Description,IsActive")] User user)
-        {
-            if (id != user.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(user.Id))
+                    Response<User> response = await _usersService.CreateAsync(user);
+                    if (response.IsSuccess)
                     {
-                        return NotFound();
+                        return RedirectToAction(nameof(Index));
                     }
-                    else
-                    {
-                        throw;
-                    }
+                    // TODO: Mostrar mensaje de error si no se creó el usero
+                    ModelState.AddModelError("", response.Message);
                 }
-                return RedirectToAction(nameof(Index));
+
+                return View(user);
             }
-            return View(user);
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Error: {ex.Message}");
+                return View(user);
+            }
         }
 
-        // GET: Users/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        [HttpGet]
+        public async Task<IActionResult> Edit([FromRoute] int id)
         {
-            if (id == null)
+            Response<User> response = await _usersService.GetOneAsync(id);
+
+            if (response.IsSuccess)
             {
-                return NotFound();
+
+                return View(response.Result);
             }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
+            //TODO: mensaje error
 
-            return View(user);
-        }
-
-        // POST: Users/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user != null)
-            {
-                _context.Users.Remove(user);
-            }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool UserExists(int id)
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(User user)
         {
-            return _context.Users.Any(e => e.Id == id);
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+
+                    //TODO: mensaje de error
+                    return View(user);
+                }
+
+                Response<User> response = await _usersService.EditAsync(user);
+
+                if (response.IsSuccess)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return View(response);
+            }
+            catch (Exception ex)
+            {
+
+                //TODO: mensaje de error
+                return View(user);
+            }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            Response<User> response = await _usersService.DeleteteAsync(id);
+
+            if (response.IsSuccess)
+            {
+                _notifyService.Success(response.Message);
+            }
+            else
+            {
+
+                _notifyService.Error(response.Message);
+
+            }
+
+
+            return RedirectToAction(nameof(Index));
+
+
+        }
+
+
+
+
     }
 }
