@@ -13,12 +13,13 @@ namespace KingsCut.Web
             // Data Context
             builder.Services.AddDbContext<DataContext>(configuration =>
             {
-                configuration.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection"));
+                configuration.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection"));
             });
 
 
-
-            builder.Services.AddNotyf(config => {
+            //Toast Notification
+            builder.Services.AddNotyf(config => 
+            {
                 config.DurationInSeconds = 10;
                 config.IsDismissable = true;
                 config.Position = NotyfPosition.BottomRight;
