@@ -1,3 +1,4 @@
+using AspNetCoreHero.ToastNotification.Extensions;
 using KingsCut.Web;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -24,9 +25,13 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.AddCustomWebAppConfiguration();
 
 app.AddCustomWebAppConfiguration();
 
