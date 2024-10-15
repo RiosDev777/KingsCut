@@ -26,7 +26,6 @@ namespace KingsCut.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            _notifyService.Success("This is a Success Notification");
             Response<List<User>> response = await _usersService.GetListAsync();
             return View(response.Result);
         }
@@ -34,6 +33,7 @@ namespace KingsCut.Web.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+
             return View();
         }
 
@@ -68,6 +68,7 @@ namespace KingsCut.Web.Controllers
                     Response<User> response = await _usersService.CreateAsync(user);
                     if (response.IsSuccess)
                     {
+                        _notifyService.Success("El usuario ha sido creado satisfactoriamente");
                         return RedirectToAction(nameof(Index));
                     }
                     // TODO: Mostrar mensaje de error si no se creó el usero
@@ -118,6 +119,7 @@ namespace KingsCut.Web.Controllers
 
                 if (response.IsSuccess)
                 {
+                    _notifyService.Success("El usuario se ha editado satisfactoriamente");
                     return RedirectToAction(nameof(Index));
                 }
 

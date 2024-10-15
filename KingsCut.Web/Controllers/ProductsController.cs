@@ -26,7 +26,7 @@ namespace KingsCut.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            _notifyService.Success("This is a Success Notification");
+            
             Response<List<Product>> response = await _productsService.GetListAsync();
             return View(response.Result);
         }
@@ -34,8 +34,11 @@ namespace KingsCut.Web.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            
             return View();
         }
+
+        
 
         //ARREGLAR
 
@@ -68,13 +71,19 @@ namespace KingsCut.Web.Controllers
                     Response<Product> response = await _productsService.CreateAsync(product);
                     if (response.IsSuccess)
                     {
+                        _notifyService.Success("El producto ha sido creado satisfactoriamente");
                         return RedirectToAction(nameof(Index));
                     }
+                    
+
                     // TODO: Mostrar mensaje de error si no se creó el producto
                     ModelState.AddModelError("", response.Message);
                 }
 
+                
+
                 return View(product);
+
             }
             catch (Exception ex)
             {
@@ -90,7 +99,7 @@ namespace KingsCut.Web.Controllers
 
             if (response.IsSuccess)
             {
-
+                
                 return View(response.Result);
             }
 
@@ -118,6 +127,7 @@ namespace KingsCut.Web.Controllers
 
                 if (response.IsSuccess)
                 {
+                    _notifyService.Success("El producto se ha editado satisfactoriamente");
                     return RedirectToAction(nameof(Index));
                 }
 
