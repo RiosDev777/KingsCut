@@ -1,9 +1,14 @@
-var builder = WebApplication.CreateBuilder(args);
+using AspNetCoreHero.ToastNotification.Extensions;
+using KingsCut.Web;
+
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-var app = builder.Build();
+builder.AddCustomBuilderConfiguration();
+
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -16,12 +21,19 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+//Importante este orden
+app.UseAuthentication();
 app.UseRouting();
-
 app.UseAuthorization();
+
+
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.AddCustomWebAppConfiguration();
+
+app.AddCustomWebAppConfiguration();
 
 app.Run();
