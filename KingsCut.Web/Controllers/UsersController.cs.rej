@@ -1,0 +1,9 @@
+diff a/KingsCut.Web/Controllers/UsersController.cs b/KingsCut.Web/Controllers/UsersController.cs	(rejected hunks)
+@@ -11,6 +11,7 @@
+ {
+     public class UsersController : Controller
+     {
++<<<<<<< Updated upstream
+ 
+         private readonly IUsersServices _usersService;
+         private readonly INotyfService _notifyService;
